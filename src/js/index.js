@@ -24,4 +24,11 @@ function materializeComments(comments, postContainer) {
     comments.forEach(comment => renderComment(comment, postContainer));
 }
 function renderComment(comment, postContainer) {
+    const singleCommentContainer = document.createElement('div');
+    singleCommentContainer.className = `single_comment_container-${comment.id}`;
+    singleCommentContainer.classList.add("single_comment_container");
+    const singleCommentContent = `
+    <p class="single-comment-content-${comment.id}">${comment.content}</p>`;
+    singleCommentContainer.innerHTML = singleCommentContent;
+    postContainer.append(singleCommentContainer);
 }

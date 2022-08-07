@@ -33,5 +33,13 @@ function materializeComments(comments:commentsI[],postContainer: HTMLDivElement)
 }
 
 function renderComment(comment:commentsI, postContainer:HTMLDivElement){
-    
+    const singleCommentContainer: HTMLDivElement = document.createElement('div')
+    singleCommentContainer.className = `single_comment_container-${comment.id}`
+    singleCommentContainer.classList.add("single_comment_container")
+    const singleCommentContent:string=`
+    <p class="single-comment-content-${comment.id}">${comment.content}</p>`
+
+    singleCommentContainer.innerHTML = singleCommentContent;
+    postContainer.append(singleCommentContainer);
+
 }

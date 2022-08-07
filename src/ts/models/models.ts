@@ -11,4 +11,5 @@ export interface commentsI{
     content: String,
     number_of_likes: number,
     post_id_post: number
+    
 }
