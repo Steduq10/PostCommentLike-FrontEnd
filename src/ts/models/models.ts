@@ -1,14 +1,14 @@
 export interface PostI{
-    id: number,
-    title: String,
-    content: String,
+    id: number|null,
+    title: string,
+    content: string,
     number_of_likes: number,
     comments: commentsI []
 }
 
 export interface commentsI{
     id?: number,
-    content: String,
+    content: string,
     number_of_likes: number,
     post_id_post: number
     
