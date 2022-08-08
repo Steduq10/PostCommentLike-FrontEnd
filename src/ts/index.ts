@@ -1,3 +1,4 @@
+import { idText } from "../../node_modules/typescript/lib/typescript.js";
 import { commentsRequestI, commentsResponseI, PostI } from "./models/models.js";
 
 import { createPost, getAllPost, editPost, deletePost, createComment, editComment, deleteComment } from "./request/asyncRequest.js";
@@ -8,19 +9,7 @@ declare global {
 }
 window.showAllPost = showAllPost;
 
-function showCommentForm(){
-const commentContainer =document.querySelector('.form-new-comment') as HTMLDivElement;
-   
-  const formComment:string =`
-  <form class="comment-form-" >
-  <input placeholder="Comment" class="content-comment" type="text"/>
-  <button class="comment-form-button" onclick="inserComment()">Submit</button>
-  </form>`
 
-  commentContainer.innerHTML = formComment;
-
-
-}
 
 function inserComment(inputId:string){
   const contentInput = document.getElementById(inputId) as HTMLInputElement;
@@ -44,12 +33,9 @@ if(contentInput.value){
       if(response.status === 200){
         
         comments.push(newComment)
-
-        //inputComment(newComment);  
-        //contentInput.value = '';
       }
     }
-  )
+  ).then(()=>showAllPost());
 }
 }
 
@@ -80,14 +66,6 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     editButton.innerText = 'Edit'
     editButton.addEventListener('click', ()=> handleEdit(post))
 
-    //const addComment:HTMLButtonElement = document.createElement('button')
-    //addComment.className = 'single-post-addComment-button'
-    //addComment.innerText = 'Comment'
-    //addComment.addEventListener('click', ()=> showCommentForm())
-    //const newCommentButton = document.createElement('button')
-    //newCommentButton.addEventListener('click', ()=> )
-    
-
     singlePostContainer.innerHTML = singlePostContent;
     singlePostContainer.append(deleteButton, editButton)
     
@@ -99,40 +77,36 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
 
 
     //CREANDO BOTON DE FORMULARIO
-const newCommentForm = document.createElement('form');
-newCommentForm.classList.add('comment-form');
+    const newCommentForm = document.createElement('form');
+    newCommentForm.classList.add('comment-form');
 
-const commentFormInput = document.createElement('input');
-commentFormInput.setAttribute('placeholder', 'Create new comment');
-commentFormInput.setAttribute('type', 'text');
+    const commentFormInput = document.createElement('input');
+    commentFormInput.setAttribute('placeholder', 'Create new comment');
+    commentFormInput.setAttribute('type', 'text');
 
-const commentFormButton = document.createElement('button');
-commentFormButton.innerText = "Comment"
-commentFormButton.setAttribute('type','button')
-commentFormInput.classList.add('content-input');
-const buttonId = `button-${post.id}`
-const inputId = `input-${post.id}`
-commentFormInput.id = inputId
-commentFormButton.id = buttonId
-commentFormButton.addEventListener('click', () => inserComment(inputId));
+    const commentFormButton = document.createElement('button');
+    commentFormButton.innerText = "Comment"
+    commentFormButton.setAttribute('type','button')
+    commentFormInput.classList.add('content-input');
+    const buttonId = `button-${post.id}`
+    const inputId = `input-${post.id}`
+    commentFormInput.id = inputId
+    commentFormButton.id = buttonId
+    commentFormButton.addEventListener('click', () => inserComment(inputId));
 
 
-newCommentForm.appendChild(commentFormInput);
-newCommentForm.appendChild(commentFormButton);
+    newCommentForm.appendChild(commentFormInput);
+    newCommentForm.appendChild(commentFormButton);
 
-singlePostContainer.appendChild(newCommentForm);
+    singlePostContainer.appendChild(newCommentForm);
 
 }
 let comments:commentsRequestI[];
+
 function materializeComments(comments:Array<commentsResponseI>,postContainer: HTMLDivElement){
- 
-  
-  comments.forEach(comment => renderComment(comment, postContainer))
-    
+    comments.forEach(comment => renderComment(comment, postContainer))
   
 }
-
-
 
 function renderComment(comment:commentsResponseI, postContainer:HTMLDivElement){
 
@@ -166,8 +140,8 @@ let posts:PostI[];
 
 function showAllPost(){
   const postDiv = document.getElementById('root') as HTMLDivElement;
-  postDiv.innerHTML = ''
-  getAllPost().then(response =>{
+    postDiv.innerHTML = ''
+    getAllPost().then(response =>{
     posts = response
     materializePost(posts)
     
@@ -199,10 +173,7 @@ function handleSubmit(e:SubmitEvent){
     createPost(newPost).then(
       response => {
         if(response.status === 200){
-          
-          //posts.push(newPost)
-
-          //inputPost(newPost);  
+           
           titleInput.value = '';
           contentInput.value = '';
         }
@@ -211,35 +182,7 @@ function handleSubmit(e:SubmitEvent){
   }
 }
 
-function inputPost(post:PostI){
-    const postContainer = document.querySelector('.post-container') as HTMLDivElement
-  
-    const div:HTMLDivElement = document.createElement('div');
-    div.className = 'single-post-container'
-    div.classList.add(`post-${post.id}`)
-    
-    const titleH2:HTMLHeadElement = document.createElement('h2');
-    titleH2.className = `single-post-title-${post.id}`
-    titleH2.innerText = post.title
-    
-    const contentP:HTMLParagraphElement = document.createElement('p')
-    contentP.className = `single-post-content-${post.id}`
-    contentP.innerText = post.content
-    
-  
-    const deleteButton:HTMLButtonElement = document.createElement('button')
-    deleteButton.className = 'single-post-delete-button'
-    deleteButton.innerText = 'Delete'
-    deleteButton.addEventListener('click', ()=> handleDelete(post))
-  
-    const editButton:HTMLButtonElement = document.createElement('button')
-    editButton.className = 'single-post-edit-button'
-    editButton.innerText = 'Edit'
-    editButton.addEventListener('click', ()=> handleEdit(post))
-  
-    div.append(titleH2, contentP, deleteButton, editButton) 
-    postContainer.append(div)
-  }
+
 
     function handleEdit(post:PostI){
     const titleInput = document.querySelector('.title-input') as HTMLInputElement;
@@ -309,120 +252,49 @@ function handleDelete(post:PostI){
   
 
 }
-
-
-
-   function recreatePost(posts:PostI[]){
-    posts.forEach(posts => createPost(posts))
-  }   
-
-//function handleComment(){
-//const formComment: HTMLFormElement|null =
-//document.querySelector('.comment-form')
-
-
-
-//formComment?.addEventListener('submit', (e) => handleCommentSubmit(e))
-//}
-
-//let comments:commentsI[];
 /*
-function handleCommentSubmit(e:SubmitEvent){
-  e.preventDefault()
+function handleCommentEdit(comment:commentsResponseI){
+  //const titleInput = document.querySelector('.title-input') as HTMLInputElement;
   const contentInput = document.querySelector('.content-input') as HTMLInputElement;
-  
-  if(contentInput.value){
-    
-    const newComment: commentsRequestI = {
-      id: null,
-      content: contentInput.value,
-     // number_of_likes: 0,
-     post_id_post: null,
-    }
-    
-
-    createComment(newComment).then(
-      response => {
-        if(response.status === 200){
-          
-          comments2.push(newComment)
-
-          inputComment(newComment);  
-          contentInput.value = '';
-        }
-      }
-    )
-  }
-}
-
-function inputComment(comment:commentsI){
-  const commentContainer = document.querySelector('.comment-container') as HTMLDivElement
-
-  const div:HTMLDivElement = document.createElement('div');
-  div.className = 'single-comment-container'
-  div.classList.add(`comment-${comment.id}`)
-  
-  const contentP:HTMLParagraphElement = document.createElement('p')
-  contentP.className = `single-comment-content-${comment.id}`
-  contentP.innerText = comment.content
-  
-
-  const deleteButton:HTMLButtonElement = document.createElement('button')
-  deleteButton.className = 'single-comment-delete-button'
-  deleteButton.innerText = 'Delete'
-  deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
-
-  const editButton:HTMLButtonElement = document.createElement('button')
-  editButton.className = 'single-comment-edit-button'
-  editButton.innerText = 'Edit'
-  editButton.addEventListener('click', ()=> handleCommentEdit(comment))
-
-  div.append( contentP, deleteButton, editButton) 
-  commentContainer.append(div)
-}
-
-  function handleCommentEdit(comment:commentsRequestI){
-  const contentInput = document.querySelector('.comment-content-input') as HTMLInputElement;
   const submitButton = document.querySelector('.comment-form-button') as HTMLButtonElement
   submitButton.classList.add('display_none')
 
   const editButton:HTMLButtonElement = document.createElement('button')
-  editButton.className = 'comment-form-edit-button'
+  editButton.className = 'form-edit-button'
   editButton.innerText = 'Edit';
   editButton.addEventListener('click', () => executeCommentEdition(comment, contentInput))
 
-  const commentformContainer = document.querySelector('.comment-form-container');
-  commentformContainer?.append(editButton)
+  const formContainer = document.querySelector('.form-container');
+  formContainer?.append(editButton)
   
   
   contentInput.value = comment.content;
 }
 
-function executeCommentEdition(comment:commentsRequestI, content:HTMLInputElement ){
+function executeCommentEdition(comment: commentsRequestI, content:HTMLInputElement){
 
 
- // const commentEdited:commentsRequestI = {
-    //id:comment.id,
-    content:content.value,
-   // number_of_likes: 0,
-    //post_id_post: comment.post_id_post,
-    
+  const commentEdited:commentsRequestI = {
+    content: content.value,
+    //number_of_likes: number,
+    postIdPost: comment.postIdPost
     
   }
 
   editComment(commentEdited).then(response => {
   if(response.status === 200){
-    const newState:commentsI[] = comments2.map(comment => comment.id === commentEdited.id?commentEdited:comment)
-    comments2 = newState;
+    const newState:commentsRequestI[] = posts.map(comments => comment.postIdPost === commentEdited.postIdPost?commentEdited.postIdPost)
+    comments = newState;
   
-    const pContent = document.querySelector(`.single-comment-content-${comment.id}`) as HTMLParagraphElement
+    
+    const pContent = document.querySelector(`.single-comment-content-${comment.postIdPost}`) as HTMLParagraphElement
     pContent.innerText = commentEdited.content
     
     content.value = ''
-    const submitButton = document.querySelector('.comment-form-button') as HTMLButtonElement
+    const submitButton = document.querySelector('.post-comment-button') as HTMLButtonElement
     submitButton.classList.remove('display_none')
   
-    const editButton = document.querySelector('.comment-form-edit-button') as HTMLButtonElement
+    const editButton = document.querySelector('.form-edit-button') as HTMLButtonElement
   
     editButton.remove()
   }
@@ -430,14 +302,20 @@ function executeCommentEdition(comment:commentsRequestI, content:HTMLInputElemen
 
 }
 
-function handleCommentDelete(comment:commentsI){
+function handleCommentDelete(comment:commentsRequestI){
+
+deleteComment(comment).then(response => {
+  
+  if(response.status === 200){
     
-  deleteComment(comment).then(response => {
-    const commentDiv = document.querySelector(`#comment-${comment.id}`) as HTMLDivElement
-    if(response.status === 200){
-      commentDiv.remove()
-      const newState:commentsI[] = posts.map(specialistPatientDiv => comment.id === specialistPatientDiv.id?comment:comment)
-      comments2 = newState;
-    }
-  })
+    //const newState:commentsRequestI[] = comments.map(specialistPatientDiv => comment.postIdPost === specialistPatientDiv.postIdPost?comment:comment)
+  //  comments = newState;
+    //postDiv.remove()
+    
+  }
+}).then(()=>showAllPost());
+
+
 }*/
+
+
