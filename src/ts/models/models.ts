@@ -7,9 +7,9 @@ export interface PostI{
 }
 
 export interface commentsI{
-    id?: number,
+    id: number|null,
     content: string,
     number_of_likes: number,
-    post_id_post: number
+    //post_id_post: number
     
 }
