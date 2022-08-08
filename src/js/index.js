@@ -1,9 +1,4 @@
 import { createPost, getAllPost, editPost, deletePost } from "./request/asyncRequest.js";
-let posts;
-getAllPost().then(response => {
-    posts = response;
-    materializePost(posts);
-});
 function materializePost(posts) {
     const divRoot = document.querySelector("#root");
     posts.forEach(post => renderPost(post, divRoot));
@@ -16,7 +11,18 @@ function renderPost(post, divRoot) {
     const singlePostContent = `
     <h2 class="single-post-title-${post.id}">${post.title}</h2>
     <p class="single-post-content-${post.id}">${post.content}</p>`;
+    //<button class= "single-post-delete-button-${post.id}">Delete</button>
+    // <button class= "single-post-edit-button-${post.id}">Edit</button>`
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'single-post-delete-button';
+    deleteButton.innerText = 'Delete';
+    deleteButton.addEventListener('click', () => handleDelete(post));
+    const editButton = document.createElement('button');
+    editButton.className = 'single-post-edit-button';
+    editButton.innerText = 'Edit';
+    editButton.addEventListener('click', () => handleEdit(post));
     singlePostContainer.innerHTML = singlePostContent;
+    singlePostContainer.append(deleteButton, editButton);
     materializeComments(post.comments, singlePostContainer);
     divRoot.append(singlePostContainer);
 }
@@ -28,17 +34,25 @@ function renderComment(comment, postContainer) {
     singleCommentContainer.className = `single_comment_container-${comment.id}`;
     singleCommentContainer.classList.add("single_comment_container");
     const singleCommentContent = `
-    <p class="single-comment-content-${comment.id}">${comment.content}</p>`;
+    <p class="single-comment-content-${comment.id}">${comment.content}</p>
+    <button class= "single-comment-delete-button-${comment.id}">Delete</button>
+    <button class= "single-comment-edit-button-${comment.id}">Edit</button>`;
     singleCommentContainer.innerHTML = singleCommentContent;
     postContainer.append(singleCommentContainer);
 }
 const formPost = document.querySelector('.post-form');
-let state = [];
+let posts;
+getAllPost().then(response => {
+    posts = response;
+    materializePost(posts);
+    //recreatePost(post)
+});
+//let state:PostI[] = []
 formPost === null || formPost === void 0 ? void 0 : formPost.addEventListener('submit', (e) => handleSubmit(e));
 function handleSubmit(e) {
     e.preventDefault();
     const titleInput = document.querySelector('.title-input');
-    const contentInput = document.querySelector('.physician-input');
+    const contentInput = document.querySelector('.content-input');
     if (titleInput.value && contentInput.value) {
         const newPost = {
             id: null,
@@ -49,7 +63,8 @@ function handleSubmit(e) {
         };
         createPost(newPost).then(response => {
             if (response.status === 200) {
-                state.push(newPost);
+                //state.push(newPost)
+                posts.push(newPost);
                 inputPost(newPost);
                 titleInput.value = '';
                 contentInput.value = '';
@@ -103,8 +118,8 @@ function executeEdition(post, title, content) {
     };
     editPost(postEdited).then(response => {
         if (response.status === 200) {
-            const newState = state.map(post => post.id === postEdited.id ? postEdited : post);
-            state = newState;
+            const newState = posts.map(post => post.id === postEdited.id ? postEdited : post);
+            posts = newState;
             const h2Title = document.querySelector(`.single-post-title-${post.id}`);
             h2Title.innerText = postEdited.title;
             const pContent = document.querySelector(`.single-post-content-${post.id}`);
@@ -119,15 +134,15 @@ function executeEdition(post, title, content) {
     });
 }
 function handleDelete(post) {
-    // const id:string = div.classList[1].split('-')[1]
     deletePost(post).then(response => {
-        const postDiv = document.querySelector(`#speciality-${post.id}`);
+        const postDiv = document.querySelector(`#post-${post.id}`);
         if (response.status === 200) {
             postDiv.remove();
-            //const newState = state.filter(specialistPatient => specialistPatient.id !== parseInt(specialistPatient.id))
-            //state = newState
-            const newState = state.map(specialistPatientDiv => post.id === specialistPatientDiv.id ? post : post);
-            state = newState;
+            const newState = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id ? post : post);
+            posts = newState;
         }
     });
+}
+function recreatePost(posts) {
+    posts.forEach(posts => createPost(posts));
 }

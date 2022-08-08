@@ -2,12 +2,9 @@ import { commentsI, PostI } from "./models/models.js";
 
 import { createPost, getAllPost, editPost, deletePost } from "./request/asyncRequest.js";
 
-let posts:PostI[];
 
-getAllPost().then(response =>{
-    posts = response
-    materializePost(posts)
-})
+
+
 
 function materializePost(posts:Array<PostI>){
     const divRoot = document.querySelector("#root") as HTMLDivElement;
@@ -15,6 +12,7 @@ function materializePost(posts:Array<PostI>){
 }
 
 function renderPost(post:PostI, divRoot:HTMLDivElement){
+  
     "container-post-${post.id}"
     const singlePostContainer = document.createElement('div');
     singlePostContainer.className = `single_post_container-${post.id}`
@@ -22,8 +20,22 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     const singlePostContent =`
     <h2 class="single-post-title-${post.id}">${post.title}</h2>
     <p class="single-post-content-${post.id}">${post.content}</p>`
+    //<button class= "single-post-delete-button-${post.id}">Delete</button>
+   // <button class= "single-post-edit-button-${post.id}">Edit</button>`
+    
+    const deleteButton:HTMLButtonElement = document.createElement('button')
+    deleteButton.className = 'single-post-delete-button'
+    deleteButton.innerText = 'Delete'
+    deleteButton.addEventListener('click', ()=> handleDelete(post))
 
+    const editButton:HTMLButtonElement = document.createElement('button')
+    editButton.className = 'single-post-edit-button'
+    editButton.innerText = 'Edit'
+    editButton.addEventListener('click', ()=> handleEdit(post))
+    
     singlePostContainer.innerHTML = singlePostContent;
+    singlePostContainer.append(deleteButton, editButton)
+    
     materializeComments(post.comments, singlePostContainer)
     divRoot.append(singlePostContainer);
 }
@@ -37,7 +49,9 @@ function renderComment(comment:commentsI, postContainer:HTMLDivElement){
     singleCommentContainer.className = `single_comment_container-${comment.id}`
     singleCommentContainer.classList.add("single_comment_container")
     const singleCommentContent:string=`
-    <p class="single-comment-content-${comment.id}">${comment.content}</p>`
+    <p class="single-comment-content-${comment.id}">${comment.content}</p>
+    <button class= "single-comment-delete-button-${comment.id}">Delete</button>
+    <button class= "single-comment-edit-button-${comment.id}">Edit</button>`
 
     singleCommentContainer.innerHTML = singleCommentContent;
     postContainer.append(singleCommentContainer);
@@ -47,14 +61,23 @@ function renderComment(comment:commentsI, postContainer:HTMLDivElement){
 const formPost: HTMLFormElement|null =
 document.querySelector('.post-form')
 
-let state:PostI[] = []
+let posts:PostI[];
+
+getAllPost().then(response =>{
+  posts = response
+  materializePost(posts)
+  //recreatePost(post)
+})
+
+
+//let state:PostI[] = []
 
 formPost?.addEventListener('submit', (e) => handleSubmit(e))
 
 function handleSubmit(e:SubmitEvent){
   e.preventDefault()
   const titleInput = document.querySelector('.title-input') as HTMLInputElement;
-  const contentInput = document.querySelector('.physician-input') as HTMLInputElement;
+  const contentInput = document.querySelector('.content-input') as HTMLInputElement;
   
   if(titleInput.value&&contentInput.value){
     
@@ -70,7 +93,8 @@ function handleSubmit(e:SubmitEvent){
     createPost(newPost).then(
       response => {
         if(response.status === 200){
-          state.push(newPost)
+          //state.push(newPost)
+          posts.push(newPost)
 
           inputPost(newPost);  
           titleInput.value = '';
@@ -143,8 +167,8 @@ function inputPost(post:PostI){
 
     editPost(postEdited).then(response => {
     if(response.status === 200){
-      const newState:PostI[] = state.map(post => post.id === postEdited.id?postEdited:post)
-      state = newState;
+      const newState:PostI[] = posts.map(post => post.id === postEdited.id?postEdited:post)
+      posts = newState;
     
       const h2Title = document.querySelector(`.single-post-title-${post.id}`) as HTMLHeadingElement
       h2Title.innerText = postEdited.title
@@ -165,16 +189,17 @@ function inputPost(post:PostI){
 }
 
 function handleDelete(post:PostI){
-    // const id:string = div.classList[1].split('-')[1]
+    
      deletePost(post).then(response => {
-       const postDiv = document.querySelector(`#speciality-${post.id}`) as HTMLDivElement
+       const postDiv = document.querySelector(`#post-${post.id}`) as HTMLDivElement
        if(response.status === 200){
-         
          postDiv.remove()
-         //const newState = state.filter(specialistPatient => specialistPatient.id !== parseInt(specialistPatient.id))
-         //state = newState
-         const newState:PostI[] = state.map(specialistPatientDiv => post.id === specialistPatientDiv.id?post:post)
-         state = newState;
+         const newState:PostI[] = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id?post:post)
+         posts = newState;
        }
      })
    }
+
+   function recreatePost(posts:PostI[]){
+    posts.forEach(posts => createPost(posts))
+  }   
