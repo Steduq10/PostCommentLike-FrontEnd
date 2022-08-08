@@ -36,7 +36,7 @@ if(contentInput.value){
       }
     }
   ).then(()=>showAllPost());
-}
+  }
 }
 
 
@@ -120,7 +120,7 @@ function renderComment(comment:commentsResponseI, postContainer:HTMLDivElement){
     const deleteButton:HTMLButtonElement = document.createElement('button')
     deleteButton.className = 'single-comment-delete-button'
     deleteButton.innerText = 'Delete'
-    //deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
+    deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
   
     const editButton:HTMLButtonElement = document.createElement('button')
     editButton.className = 'single-comment-edit-button'
@@ -243,7 +243,7 @@ function handleDelete(post:PostI){
     
     if(response.status === 200){
       
-      const newState:PostI[] = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id?post:post)
+      const newState:PostI[] = posts.map(post => post.id === post.id?post:post)
       posts = newState;
       //postDiv.remove()
       
@@ -300,22 +300,30 @@ function executeCommentEdition(comment: commentsRequestI, content:HTMLInputEleme
   }
 })
 
-}
+*/
 
-function handleCommentDelete(comment:commentsRequestI){
+function handleCommentDelete(comment:commentsResponseI){
+  let commentDelete: commentsRequestI = {
+    
+     content: comment.content,
+     
+     postIdPost: {
+       id: comment.id
+     }
+  }
 
-deleteComment(comment).then(response => {
+deleteComment(commentDelete).then(response => {
   
   if(response.status === 200){
     
-    //const newState:commentsRequestI[] = comments.map(specialistPatientDiv => comment.postIdPost === specialistPatientDiv.postIdPost?comment:comment)
-  //  comments = newState;
+    const newState:commentsRequestI[] = comments.map(commentDelete => commentDelete.postIdPost === commentDelete.postIdPost?commentDelete:commentDelete)
+    comments = newState;
     //postDiv.remove()
     
   }
 }).then(()=>showAllPost());
 
 
-}*/
+}
 
 

@@ -1,4 +1,4 @@
-import { createPost, getAllPost, editPost, deletePost, createComment } from "./request/asyncRequest.js";
+import { createPost, getAllPost, editPost, deletePost, createComment, deleteComment } from "./request/asyncRequest.js";
 window.showAllPost = showAllPost;
 function inserComment(inputId) {
     const contentInput = document.getElementById(inputId);
@@ -77,7 +77,7 @@ function renderComment(comment, postContainer) {
     const deleteButton = document.createElement('button');
     deleteButton.className = 'single-comment-delete-button';
     deleteButton.innerText = 'Delete';
-    //deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
+    deleteButton.addEventListener('click', () => handleCommentDelete(comment));
     const editButton = document.createElement('button');
     editButton.className = 'single-comment-edit-button';
     editButton.innerText = 'Edit';
@@ -159,7 +159,7 @@ function executeEdition(post, title, content) {
 function handleDelete(post) {
     deletePost(post).then(response => {
         if (response.status === 200) {
-            const newState = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id ? post : post);
+            const newState = posts.map(post => post.id === post.id ? post : post);
             posts = newState;
             //postDiv.remove()
         }
@@ -213,20 +213,19 @@ function executeCommentEdition(comment: commentsRequestI, content:HTMLInputEleme
   }
 })
 
+*/
+function handleCommentDelete(comment) {
+    let commentDelete = {
+        content: comment.content,
+        postIdPost: {
+            id: comment.id
+        }
+    };
+    deleteComment(commentDelete).then(response => {
+        if (response.status === 200) {
+            const newState = comments.map(commentDelete => commentDelete.postIdPost === commentDelete.postIdPost ? commentDelete : commentDelete);
+            comments = newState;
+            //postDiv.remove()
+        }
+    }).then(() => showAllPost());
 }
-
-function handleCommentDelete(comment:commentsRequestI){
-
-deleteComment(comment).then(response => {
-  
-  if(response.status === 200){
-    
-    //const newState:commentsRequestI[] = comments.map(specialistPatientDiv => comment.postIdPost === specialistPatientDiv.postIdPost?comment:comment)
-  //  comments = newState;
-    //postDiv.remove()
-    
-  }
-}).then(()=>showAllPost());
-
-
-}*/
