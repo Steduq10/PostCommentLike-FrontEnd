@@ -52,6 +52,8 @@ export function editPost(post) {
 }
 export function createComment(comment) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("creando comentario");
+        console.log(comment);
         const response = yield fetch('http://localhost:8080/api/v1/create/comment', {
             method: 'POST',
             headers: {

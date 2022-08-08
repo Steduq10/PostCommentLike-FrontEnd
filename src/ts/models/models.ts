@@ -3,13 +3,21 @@ export interface PostI{
     title: string,
     content: string,
     number_of_likes: number,
-    comments: commentsI []
+    comments: commentsResponseI []
 }
 
-export interface commentsI{
+export interface commentsRequestI{
+    //id: number|null,
+    content: string,
+    //number_of_likes: number,
+    postIdPost: object
+    
+}
+
+export interface commentsResponseI{
     id: number|null,
     content: string,
     //number_of_likes: number,
-    post_id_post: number|null
+    postIdPost: number|null
     
 }

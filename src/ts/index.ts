@@ -1,44 +1,56 @@
-import { commentsI, PostI } from "./models/models.js";
+import { commentsRequestI, commentsResponseI, PostI } from "./models/models.js";
 
 import { createPost, getAllPost, editPost, deletePost, createComment, editComment, deleteComment } from "./request/asyncRequest.js";
-
+declare global {
+  interface Window {
+      showAllPost:any
+  }
+}
+window.showAllPost = showAllPost;
 
 function showCommentForm(){
 const commentContainer =document.querySelector('.form-new-comment') as HTMLDivElement;
    
   const formComment:string =`
   <form class="comment-form-" >
-  <input placeholder="Comment" class="content-comment type="text"/>
-  <button class="comment-form-button">Submit</button>
+  <input placeholder="Comment" class="content-comment" type="text"/>
+  <button class="comment-form-button" onclick="inserComment()">Submit</button>
   </form>`
 
   commentContainer.innerHTML = formComment;
 
-  const contentInput = document.querySelector('.content-comment-input') as HTMLInputElement;
-  
-  if(contentInput.value){
-    
-    const newComment: commentsI = {
-      id: null,
-      content: contentInput.value,
-      //number_of_likes: 0,
-      post_id_post: null,
+
+}
+
+function inserComment(inputId:string){
+  const contentInput = document.getElementById(inputId) as HTMLInputElement;
+  console.log(contentInput.value)
+
+if(contentInput.value){
+  const id = inputId.split('-')[1]
+  console.log(contentInput.value)
+  const newComment: commentsRequestI = {
+   // id: null,
+    content: contentInput.value,
+    //number_of_likes: 0,
+    postIdPost: {
+      id: Number(id)
     }
-    
-
-    createComment(newComment).then(
-      response => {
-        if(response.status === 200){
-          
-          comments2.push(newComment)
-
-          //inputComment(newComment);  
-          //contentInput.value = '';
-        }
-      }
-    )
   }
+  
 
+  createComment(newComment).then(
+    response => {
+      if(response.status === 200){
+        
+        comments.push(newComment)
+
+        //inputComment(newComment);  
+        //contentInput.value = '';
+      }
+    }
+  )
+}
 }
 
 
@@ -68,21 +80,51 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     editButton.innerText = 'Edit'
     editButton.addEventListener('click', ()=> handleEdit(post))
 
-    const addComment:HTMLButtonElement = document.createElement('button')
-    addComment.className = 'single-post-addComment-button'
-    addComment.innerText = 'Comment'
-    addComment.addEventListener('click', ()=> showCommentForm())
-
+    //const addComment:HTMLButtonElement = document.createElement('button')
+    //addComment.className = 'single-post-addComment-button'
+    //addComment.innerText = 'Comment'
+    //addComment.addEventListener('click', ()=> showCommentForm())
+    //const newCommentButton = document.createElement('button')
+    //newCommentButton.addEventListener('click', ()=> )
     
 
     singlePostContainer.innerHTML = singlePostContent;
-    singlePostContainer.append(deleteButton, editButton, addComment)
+    singlePostContainer.append(deleteButton, editButton)
     
     materializeComments(post.comments, singlePostContainer)
     divRoot.append(singlePostContainer);
+    
+
+
+
+
+    //CREANDO BOTON DE FORMULARIO
+const newCommentForm = document.createElement('form');
+newCommentForm.classList.add('comment-form');
+
+const commentFormInput = document.createElement('input');
+commentFormInput.setAttribute('placeholder', 'Create new comment');
+commentFormInput.setAttribute('type', 'text');
+
+const commentFormButton = document.createElement('button');
+commentFormButton.innerText = "Comment"
+commentFormButton.setAttribute('type','button')
+commentFormInput.classList.add('content-input');
+const buttonId = `button-${post.id}`
+const inputId = `input-${post.id}`
+commentFormInput.id = inputId
+commentFormButton.id = buttonId
+commentFormButton.addEventListener('click', () => inserComment(inputId));
+
+
+newCommentForm.appendChild(commentFormInput);
+newCommentForm.appendChild(commentFormButton);
+
+singlePostContainer.appendChild(newCommentForm);
+
 }
-let comments2:commentsI[];
-function materializeComments(comments:Array<commentsI>,postContainer: HTMLDivElement){
+let comments:commentsRequestI[];
+function materializeComments(comments:Array<commentsResponseI>,postContainer: HTMLDivElement){
  
   
   comments.forEach(comment => renderComment(comment, postContainer))
@@ -92,7 +134,7 @@ function materializeComments(comments:Array<commentsI>,postContainer: HTMLDivEle
 
 
 
-function renderComment(comment:commentsI, postContainer:HTMLDivElement){
+function renderComment(comment:commentsResponseI, postContainer:HTMLDivElement){
 
     const singleCommentContainer: HTMLDivElement = document.createElement('div')
     singleCommentContainer.className = `single_comment_container-${comment.id}`
@@ -104,12 +146,12 @@ function renderComment(comment:commentsI, postContainer:HTMLDivElement){
     const deleteButton:HTMLButtonElement = document.createElement('button')
     deleteButton.className = 'single-comment-delete-button'
     deleteButton.innerText = 'Delete'
-    deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
+    //deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
   
     const editButton:HTMLButtonElement = document.createElement('button')
     editButton.className = 'single-comment-edit-button'
     editButton.innerText = 'Edit'
-    editButton.addEventListener('click', ()=> handleCommentEdit(comment))
+    //editButton.addEventListener('click', ()=> handleCommentEdit(comment))
 
     singleCommentContainer.innerHTML = singleCommentContent;
     singleCommentContainer.append(deleteButton,editButton)
@@ -122,11 +164,16 @@ document.querySelector('.post-form')
 
 let posts:PostI[];
 
-getAllPost().then(response =>{
-  posts = response
-  materializePost(posts)
-  
-})
+function showAllPost(){
+  const postDiv = document.getElementById('root') as HTMLDivElement;
+  postDiv.innerHTML = ''
+  getAllPost().then(response =>{
+    posts = response
+    materializePost(posts)
+    
+  })
+}
+
 
 
 
@@ -153,14 +200,14 @@ function handleSubmit(e:SubmitEvent){
       response => {
         if(response.status === 200){
           
-          posts.push(newPost)
+          //posts.push(newPost)
 
-          inputPost(newPost);  
+          //inputPost(newPost);  
           titleInput.value = '';
           contentInput.value = '';
         }
       }
-    )
+    ).then(()=>showAllPost());
   }
 }
 
@@ -250,15 +297,15 @@ function inputPost(post:PostI){
 function handleDelete(post:PostI){
   
   deletePost(post).then(response => {
-    const postDiv = document.querySelector(`#post-${post.id}`) as HTMLDivElement
+    
     if(response.status === 200){
       
       const newState:PostI[] = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id?post:post)
       posts = newState;
-      postDiv.remove()
+      //postDiv.remove()
       
     }
-  })
+  }).then(()=>showAllPost());
   
 
 }
@@ -269,24 +316,24 @@ function handleDelete(post:PostI){
     posts.forEach(posts => createPost(posts))
   }   
 
-function handleComment(){
-const formComment: HTMLFormElement|null =
-document.querySelector('.comment-form')
+//function handleComment(){
+//const formComment: HTMLFormElement|null =
+//document.querySelector('.comment-form')
 
 
 
-formComment?.addEventListener('submit', (e) => handleCommentSubmit(e))
-}
+//formComment?.addEventListener('submit', (e) => handleCommentSubmit(e))
+//}
 
 //let comments:commentsI[];
-
+/*
 function handleCommentSubmit(e:SubmitEvent){
   e.preventDefault()
   const contentInput = document.querySelector('.content-input') as HTMLInputElement;
   
   if(contentInput.value){
     
-    const newComment: commentsI = {
+    const newComment: commentsRequestI = {
       id: null,
       content: contentInput.value,
      // number_of_likes: 0,
@@ -334,7 +381,7 @@ function inputComment(comment:commentsI){
   commentContainer.append(div)
 }
 
-  function handleCommentEdit(comment:commentsI){
+  function handleCommentEdit(comment:commentsRequestI){
   const contentInput = document.querySelector('.comment-content-input') as HTMLInputElement;
   const submitButton = document.querySelector('.comment-form-button') as HTMLButtonElement
   submitButton.classList.add('display_none')
@@ -351,14 +398,14 @@ function inputComment(comment:commentsI){
   contentInput.value = comment.content;
 }
 
-function executeCommentEdition(comment:commentsI, content:HTMLInputElement ){
+function executeCommentEdition(comment:commentsRequestI, content:HTMLInputElement ){
 
 
-  const commentEdited:commentsI = {
-    id:comment.id,
+ // const commentEdited:commentsRequestI = {
+    //id:comment.id,
     content:content.value,
    // number_of_likes: 0,
-    post_id_post: comment.post_id_post,
+    //post_id_post: comment.post_id_post,
     
     
   }
@@ -393,4 +440,4 @@ function handleCommentDelete(comment:commentsI){
       comments2 = newState;
     }
   })
-}
+}*/
