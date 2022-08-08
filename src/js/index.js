@@ -2,9 +2,9 @@ import { createPost, getAllPost, editPost, deletePost, createComment, editCommen
 function showCommentForm() {
     const commentContainer = document.querySelector('.form-new-comment');
     const formComment = `
-  <form class="comment-form-" action="##">
+  <form class="comment-form-" >
   <input placeholder="Comment" class="content-comment type="text"/>
-  <button class="comments-form-button">Submit</button>
+  <button class="comment-form-button">Submit</button>
   </form>`;
     commentContainer.innerHTML = formComment;
     const contentInput = document.querySelector('.content-comment-input');
@@ -12,13 +12,14 @@ function showCommentForm() {
         const newComment = {
             id: null,
             content: contentInput.value,
-            number_of_likes: 0,
+            //number_of_likes: 0,
+            post_id_post: null,
         };
         createComment(newComment).then(response => {
             if (response.status === 200) {
-                comments.push(newComment);
-                inputComment(newComment);
-                contentInput.value = '';
+                comments2.push(newComment);
+                //inputComment(newComment);  
+                //contentInput.value = '';
             }
         });
     }
@@ -52,6 +53,7 @@ function renderPost(post, divRoot) {
     materializeComments(post.comments, singlePostContainer);
     divRoot.append(singlePostContainer);
 }
+let comments2;
 function materializeComments(comments, postContainer) {
     comments.forEach(comment => renderComment(comment, postContainer));
 }
@@ -167,9 +169,9 @@ function handleDelete(post) {
     deletePost(post).then(response => {
         const postDiv = document.querySelector(`#post-${post.id}`);
         if (response.status === 200) {
-            postDiv.remove();
             const newState = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id ? post : post);
             posts = newState;
+            postDiv.remove();
         }
     });
 }
@@ -180,7 +182,7 @@ function handleComment() {
     const formComment = document.querySelector('.comment-form');
     formComment === null || formComment === void 0 ? void 0 : formComment.addEventListener('submit', (e) => handleCommentSubmit(e));
 }
-let comments;
+//let comments:commentsI[];
 function handleCommentSubmit(e) {
     e.preventDefault();
     const contentInput = document.querySelector('.content-input');
@@ -188,11 +190,12 @@ function handleCommentSubmit(e) {
         const newComment = {
             id: null,
             content: contentInput.value,
-            number_of_likes: 0,
+            // number_of_likes: 0,
+            post_id_post: null,
         };
         createComment(newComment).then(response => {
             if (response.status === 200) {
-                comments.push(newComment);
+                comments2.push(newComment);
                 inputComment(newComment);
                 contentInput.value = '';
             }
@@ -234,12 +237,13 @@ function executeCommentEdition(comment, content) {
     const commentEdited = {
         id: comment.id,
         content: content.value,
-        number_of_likes: 0,
+        // number_of_likes: 0,
+        post_id_post: comment.post_id_post,
     };
     editComment(commentEdited).then(response => {
         if (response.status === 200) {
-            const newState = posts.map(post => post.id === commentEdited.id ? commentEdited : post);
-            comments = newState;
+            const newState = comments2.map(comment => comment.id === commentEdited.id ? commentEdited : comment);
+            comments2 = newState;
             const pContent = document.querySelector(`.single-comment-content-${comment.id}`);
             pContent.innerText = commentEdited.content;
             content.value = '';
@@ -256,7 +260,7 @@ function handleCommentDelete(comment) {
         if (response.status === 200) {
             commentDiv.remove();
             const newState = posts.map(specialistPatientDiv => comment.id === specialistPatientDiv.id ? comment : comment);
-            comments = newState;
+            comments2 = newState;
         }
     });
 }

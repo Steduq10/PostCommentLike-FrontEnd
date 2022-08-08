@@ -7,9 +7,9 @@ function showCommentForm(){
 const commentContainer =document.querySelector('.form-new-comment') as HTMLDivElement;
    
   const formComment:string =`
-  <form class="comment-form-" action="##">
+  <form class="comment-form-" >
   <input placeholder="Comment" class="content-comment type="text"/>
-  <button class="comments-form-button">Submit</button>
+  <button class="comment-form-button">Submit</button>
   </form>`
 
   commentContainer.innerHTML = formComment;
@@ -21,7 +21,8 @@ const commentContainer =document.querySelector('.form-new-comment') as HTMLDivEl
     const newComment: commentsI = {
       id: null,
       content: contentInput.value,
-      number_of_likes: 0,
+      //number_of_likes: 0,
+      post_id_post: null,
     }
     
 
@@ -29,10 +30,10 @@ const commentContainer =document.querySelector('.form-new-comment') as HTMLDivEl
       response => {
         if(response.status === 200){
           
-          comments.push(newComment)
+          comments2.push(newComment)
 
-          inputComment(newComment);  
-          contentInput.value = '';
+          //inputComment(newComment);  
+          //contentInput.value = '';
         }
       }
     )
@@ -73,7 +74,6 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     addComment.addEventListener('click', ()=> showCommentForm())
 
     
-    
 
     singlePostContainer.innerHTML = singlePostContent;
     singlePostContainer.append(deleteButton, editButton, addComment)
@@ -81,12 +81,16 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     materializeComments(post.comments, singlePostContainer)
     divRoot.append(singlePostContainer);
 }
-
-function materializeComments(comments:commentsI[],postContainer: HTMLDivElement){
-    comments.forEach(comment => renderComment(comment, postContainer))
+let comments2:commentsI[];
+function materializeComments(comments:Array<commentsI>,postContainer: HTMLDivElement){
+ 
+  
+  comments.forEach(comment => renderComment(comment, postContainer))
     
-    
+  
 }
+
+
 
 function renderComment(comment:commentsI, postContainer:HTMLDivElement){
 
@@ -248,11 +252,15 @@ function handleDelete(post:PostI){
   deletePost(post).then(response => {
     const postDiv = document.querySelector(`#post-${post.id}`) as HTMLDivElement
     if(response.status === 200){
-      postDiv.remove()
+      
       const newState:PostI[] = posts.map(specialistPatientDiv => post.id === specialistPatientDiv.id?post:post)
       posts = newState;
+      postDiv.remove()
+      
     }
   })
+  
+
 }
 
 
@@ -270,7 +278,7 @@ document.querySelector('.comment-form')
 formComment?.addEventListener('submit', (e) => handleCommentSubmit(e))
 }
 
-let comments:commentsI[];
+//let comments:commentsI[];
 
 function handleCommentSubmit(e:SubmitEvent){
   e.preventDefault()
@@ -281,7 +289,8 @@ function handleCommentSubmit(e:SubmitEvent){
     const newComment: commentsI = {
       id: null,
       content: contentInput.value,
-      number_of_likes: 0,
+     // number_of_likes: 0,
+     post_id_post: null,
     }
     
 
@@ -289,7 +298,7 @@ function handleCommentSubmit(e:SubmitEvent){
       response => {
         if(response.status === 200){
           
-          comments.push(newComment)
+          comments2.push(newComment)
 
           inputComment(newComment);  
           contentInput.value = '';
@@ -342,21 +351,22 @@ function inputComment(comment:commentsI){
   contentInput.value = comment.content;
 }
 
-function executeCommentEdition(comment:commentsI, content:HTMLInputElement){
+function executeCommentEdition(comment:commentsI, content:HTMLInputElement ){
 
 
   const commentEdited:commentsI = {
     id:comment.id,
     content:content.value,
-    number_of_likes: 0,
+   // number_of_likes: 0,
+    post_id_post: comment.post_id_post,
     
     
   }
 
   editComment(commentEdited).then(response => {
   if(response.status === 200){
-    const newState:commentsI[] = posts.map(post => post.id === commentEdited.id?commentEdited:post)
-    comments = newState;
+    const newState:commentsI[] = comments2.map(comment => comment.id === commentEdited.id?commentEdited:comment)
+    comments2 = newState;
   
     const pContent = document.querySelector(`.single-comment-content-${comment.id}`) as HTMLParagraphElement
     pContent.innerText = commentEdited.content
@@ -380,7 +390,7 @@ function handleCommentDelete(comment:commentsI){
     if(response.status === 200){
       commentDiv.remove()
       const newState:commentsI[] = posts.map(specialistPatientDiv => comment.id === specialistPatientDiv.id?comment:comment)
-      comments = newState;
+      comments2 = newState;
     }
   })
 }
