@@ -16,7 +16,7 @@ function inserComment(inputId) {
         };
         createComment(newComment).then(response => {
             if (response.status === 200) {
-                comments.push(newComment);
+                const apiData = response.json();
             }
         }).then(() => showAllPost());
     }
@@ -64,7 +64,6 @@ function renderPost(post, divRoot) {
     newCommentForm.appendChild(commentFormButton);
     singlePostContainer.appendChild(newCommentForm);
 }
-let comments;
 function materializeComments(comments, postContainer) {
     comments.forEach(comment => renderComment(comment, postContainer));
 }
@@ -77,7 +76,7 @@ function renderComment(comment, postContainer) {
     const deleteButton = document.createElement('button');
     deleteButton.className = 'single-comment-delete-button';
     deleteButton.innerText = 'Delete';
-    deleteButton.addEventListener('click', () => handleCommentDelete(comment));
+    deleteButton.addEventListener('click', () => handleCommentDelete(Number(comment.id)));
     const editButton = document.createElement('button');
     editButton.className = 'single-comment-edit-button';
     editButton.innerText = 'Edit';
@@ -214,18 +213,6 @@ function executeCommentEdition(comment: commentsRequestI, content:HTMLInputEleme
 })
 
 */
-function handleCommentDelete(comment) {
-    let commentDelete = {
-        content: comment.content,
-        postIdPost: {
-            id: comment.id
-        }
-    };
-    deleteComment(commentDelete).then(response => {
-        if (response.status === 200) {
-            const newState = comments.map(commentDelete => commentDelete.postIdPost === commentDelete.postIdPost ? commentDelete : commentDelete);
-            comments = newState;
-            //postDiv.remove()
-        }
-    }).then(() => showAllPost());
+function handleCommentDelete(id) {
+    deleteComment(id).then(() => showAllPost());
 }

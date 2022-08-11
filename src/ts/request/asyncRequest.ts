@@ -62,14 +62,14 @@ export async function createPost(post:PostI){
     return response;
   }
   
-  export async function deleteComment(comment:commentsRequestI){
-    const response:Response = await fetch('http://localhost:8080/api/v1/delete/comment', 
+  export async function deleteComment(commentId: number){
+    const response:Response = await fetch(`http://localhost:8080/api/v1/delete/comment/${commentId}`, 
     {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
     },
-    body: JSON.stringify(comment)
+    body: JSON.stringify(commentId)
     })
   
     return response;

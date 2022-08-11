@@ -64,14 +64,14 @@ export function createComment(comment) {
         return response;
     });
 }
-export function deleteComment(comment) {
+export function deleteComment(commentId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield fetch('http://localhost:8080/api/v1/delete/comment', {
+        const response = yield fetch(`http://localhost:8080/api/v1/delete/comment/${commentId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(comment)
+            body: JSON.stringify(commentId)
         });
         return response;
     });

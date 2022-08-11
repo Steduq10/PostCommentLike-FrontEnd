@@ -15,27 +15,26 @@ function inserComment(inputId:string){
   const contentInput = document.getElementById(inputId) as HTMLInputElement;
   console.log(contentInput.value)
 
-if(contentInput.value){
-  const id = inputId.split('-')[1]
-  console.log(contentInput.value)
-  const newComment: commentsRequestI = {
-   // id: null,
-    content: contentInput.value,
-    //number_of_likes: 0,
-    postIdPost: {
-      id: Number(id)
-    }
-  }
-  
-
-  createComment(newComment).then(
-    response => {
-      if(response.status === 200){
-        
-        comments.push(newComment)
+  if(contentInput.value){
+    const id = inputId.split('-')[1]
+    console.log(contentInput.value)
+    const newComment: commentsRequestI = {
+    // id: null,
+      content: contentInput.value,
+      //number_of_likes: 0,
+      postIdPost: {
+        id: Number(id)
       }
     }
-  ).then(()=>showAllPost());
+    
+
+    createComment(newComment).then(
+      response => {
+        if(response.status === 200){
+          const apiData = response.json();
+        }
+      }
+    ).then(()=>showAllPost());
   }
 }
 
@@ -101,7 +100,6 @@ function renderPost(post:PostI, divRoot:HTMLDivElement){
     singlePostContainer.appendChild(newCommentForm);
 
 }
-let comments:commentsRequestI[];
 
 function materializeComments(comments:Array<commentsResponseI>,postContainer: HTMLDivElement){
     comments.forEach(comment => renderComment(comment, postContainer))
@@ -120,7 +118,7 @@ function renderComment(comment:commentsResponseI, postContainer:HTMLDivElement){
     const deleteButton:HTMLButtonElement = document.createElement('button')
     deleteButton.className = 'single-comment-delete-button'
     deleteButton.innerText = 'Delete'
-    deleteButton.addEventListener('click', ()=> handleCommentDelete(comment))
+    deleteButton.addEventListener('click', ()=> handleCommentDelete(Number(comment.id)))
   
     const editButton:HTMLButtonElement = document.createElement('button')
     editButton.className = 'single-comment-edit-button'
@@ -302,27 +300,9 @@ function executeCommentEdition(comment: commentsRequestI, content:HTMLInputEleme
 
 */
 
-function handleCommentDelete(comment:commentsResponseI){
-  let commentDelete: commentsRequestI = {
-    
-     content: comment.content,
-     
-     postIdPost: {
-       id: comment.id
-     }
-  }
+function handleCommentDelete(id:number){
 
-deleteComment(commentDelete).then(response => {
-  
-  if(response.status === 200){
-    
-    const newState:commentsRequestI[] = comments.map(commentDelete => commentDelete.postIdPost === commentDelete.postIdPost?commentDelete:commentDelete)
-    comments = newState;
-    //postDiv.remove()
-    
-  }
-}).then(()=>showAllPost());
-
+  deleteComment(id).then(()=>showAllPost());
 
 }
 
