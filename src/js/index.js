@@ -43,6 +43,7 @@ function renderPost(post, divRoot) {
     editButton.addEventListener('click', () => handleEdit(post));
     singlePostContainer.innerHTML = singlePostContent;
     singlePostContainer.append(deleteButton, editButton);
+    //singlePostContainer.append(deleteButton)
     materializeComments(post.comments, singlePostContainer);
     divRoot.append(singlePostContainer);
     //CREANDO BOTON DE FORMULARIO
@@ -80,9 +81,10 @@ function renderComment(comment, postContainer) {
     const editButton = document.createElement('button');
     editButton.className = 'single-comment-edit-button';
     editButton.innerText = 'Edit';
-    //editButton.addEventListener('click', ()=> handleCommentEdit(comment))
+    editButton.addEventListener('click', () => handleCommentEdit(comment, comment.id));
     singleCommentContainer.innerHTML = singleCommentContent;
     singleCommentContainer.append(deleteButton, editButton);
+    singleCommentContainer.append(deleteButton);
     postContainer.append(singleCommentContainer);
 }
 const formPost = document.querySelector('.post-form');
@@ -164,25 +166,35 @@ function handleDelete(post) {
         }
     }).then(() => showAllPost());
 }
-/*
-function handleCommentEdit(comment:commentsResponseI){
-  //const titleInput = document.querySelector('.title-input') as HTMLInputElement;
-  const contentInput = document.querySelector('.content-input') as HTMLInputElement;
-  const submitButton = document.querySelector('.comment-form-button') as HTMLButtonElement
-  submitButton.classList.add('display_none')
-
-  const editButton:HTMLButtonElement = document.createElement('button')
-  editButton.className = 'form-edit-button'
-  editButton.innerText = 'Edit';
-  editButton.addEventListener('click', () => executeCommentEdition(comment, contentInput))
-
-  const formContainer = document.querySelector('.form-container');
-  formContainer?.append(editButton)
-  
-  
-  contentInput.value = comment.content;
+function handleCommentEdit(comment, commentId) {
+    console.log("entradando a la edicion del comentario");
+    const editCommentContainer = document.createElement('div');
+    const editCommentForm = document.createElement('editform');
+    editCommentForm.classList.add('editcomment-form');
+    const editcommentFormInput = document.createElement('input');
+    editcommentFormInput.setAttribute('placeholder', 'edit the comment');
+    editcommentFormInput.setAttribute('type', 'text');
+    const editcommentFormButton = document.createElement('button');
+    editcommentFormButton.innerText = "Edit";
+    editcommentFormButton.setAttribute('type', 'button');
+    editcommentFormInput.classList.add('content-input');
+    const editbuttonId = `editbutton-${comment.id}`;
+    const editinputId = `editinput-${comment.id}`;
+    editcommentFormInput.id = editinputId;
+    editcommentFormButton.id = editbuttonId;
+    //editcommentFormButton.addEventListener('click', () => executeCommentEdition(comment, editinputId))
+    //editcommentFormButton.addEventListener('click', () => inserComment(inputId));
+    editCommentForm.appendChild(editcommentFormInput);
+    editCommentForm.appendChild(editcommentFormButton);
+    editCommentContainer.appendChild(editCommentForm);
+    const parentContainer = document.querySelector(`.single_comment_container-${commentId}`);
+    console.log(parentContainer);
+    parentContainer.appendChild(editCommentContainer);
+    //const formContainer = document.querySelector('.form-container');
+    //formContainer?.append(editButton)
+    //contentInput.value = comment.content;
 }
-
+/*
 function executeCommentEdition(comment: commentsRequestI, content:HTMLInputElement){
 
 
@@ -211,8 +223,7 @@ function executeCommentEdition(comment: commentsRequestI, content:HTMLInputEleme
     editButton.remove()
   }
 })
-
-*/
+}*/
 function handleCommentDelete(id) {
     deleteComment(id).then(() => showAllPost());
 }
